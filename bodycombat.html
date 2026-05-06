@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BodyCombat 歌單</title>
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --bg2: #fffdf9;
+    --bg3: #ede8df;
+    --accent: #c0392b;
+    --accent2: #e74c3c;
+    --text: #2c2416;
+    --text2: #7a6a52;
+    --text3: #b0a08a;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.15);
+    --danger: #c0392b;
+    --success: #27ae60;
+    --warn: #e67e22;
+    --radius: 14px;
+    --radius-sm: 9px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'SF Pro Display', -apple-system, 'PingFang TC', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 72px;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    background: rgba(245,240,232,0.97);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border2);
+    border-bottom: none;
+    border-radius: 20px 20px 0 0;
+    display: flex; height: 62px;
+    width: 100%; max-width: 680px;
+  }
+  .nav-tab {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 3px;
+    font-size: 11px; color: var(--text3);
+    cursor: pointer; transition: color .2s; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-tab .nav-icon { font-size: 22px; line-height: 1; }
+  .nav-tab.active { color: var(--accent); font-weight: 600; }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 16px; max-width: 680px; margin: 0 auto; }
+  .page.active { display: block; }
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .page-header h2 { font-size: 22px; font-weight: 600; color: var(--text); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 9px 16px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border2);
+    background: var(--bg2); color: var(--text); font-size: 14px;
+    cursor: pointer; transition: opacity .15s; white-space: nowrap;
+    -webkit-tap-highlight-color: transparent; font-weight: 500;
+  }
+  .btn:active { opacity: 0.6; }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-danger { color: var(--danger); border-color: rgba(192,57,43,0.3); background: rgba(192,57,43,0.05); }
+  .btn-sm { padding: 7px 12px; font-size: 13px; }
+
+  /* ── TRACK CARD ── */
+  .track-card {
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .track-card-top {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+  }
+  .track-num {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    color: var(--text3); min-width: 50px; text-transform: uppercase;
+  }
+  .release-badge {
+    background: var(--accent); color: #fff;
+    border-radius: 8px; padding: 5px 14px;
+    font-size: 20px; font-weight: 700;
+    min-width: 58px; text-align: center;
+  }
+  .release-meta { font-size: 12px; color: var(--text2); flex: 1; }
+  .release-meta.never { color: var(--warn); font-weight: 600; }
+
+  .track-card-bottom {
+    display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  .track-select {
+    background: var(--bg3); border: 1.5px solid var(--border2);
+    color: var(--text); border-radius: var(--radius-sm);
+    padding: 8px 10px; font-size: 14px; flex: 1; min-width: 80px;
+    font-weight: 500;
+  }
+  .track-select:focus { outline: none; border-color: var(--accent); }
+  .track-add-input {
+    background: var(--bg3); border: 1.5px solid var(--border2);
+    color: var(--text); border-radius: var(--radius-sm);
+    padding: 6px 6px; font-size: 13px; width: 64px;
+  }
+  .track-add-input:focus { outline: none; border-color: var(--accent); }
+
+  /* ── SAVE BAR ── */
+  .save-bar {
+    background: var(--bg2); border: 1.5px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+    margin-top: 16px; display: flex; flex-direction: column; gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .save-bar-row { display: flex; align-items: center; gap: 10px; }
+  .save-bar label { font-size: 13px; color: var(--text2); white-space: nowrap; font-weight: 500; min-width: 30px; }
+  .save-bar input, .save-bar select, .save-bar-text-input {
+    background: var(--bg3); border: 1.5px solid var(--border2);
+    color: var(--text); border-radius: var(--radius-sm);
+    padding: 9px 12px; font-size: 15px; flex: 1;
+    font-family: inherit;
+  }
+  .save-bar input:focus, .save-bar select:focus, .save-bar-text-input:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .venue-fixed-tag {
+    background: var(--accent); color: #fff;
+    border-radius: var(--radius-sm); padding: 9px 14px;
+    font-size: 15px; font-weight: 600; flex: 1; text-align: center;
+  }
+
+  /* ── LOADING ── */
+  .loading { text-align: center; padding: 48px; color: var(--text3); font-size: 15px; }
+  .spinner {
+    width: 28px; height: 28px; border: 2.5px solid var(--border2);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin .8s linear infinite; margin: 0 auto 14px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── HISTORY CARDS ── */
+  .history-table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    background: var(--bg2);
+    margin-bottom: 0;
+    max-height: 82vh;
+    overflow-y: auto;
+  }
+  .history-table {
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 100%;
+    font-size: 15px;
+  }
+  .history-table thead tr {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg3);
+  }
+  .history-table th {
+    padding: 11px 14px;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--text3); text-align: center;
+    border-bottom: 1.5px solid var(--border2);
+    white-space: nowrap; background: var(--bg3);
+  }
+  .history-table th.col-date, .history-table th.col-venue { text-align: left; }
+  .history-table th.col-date { min-width: 106px; }
+  .history-table th.col-venue { min-width: 100px; }
+  .history-table th.col-track { min-width: 52px; }
+  .history-table td {
+    padding: 11px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+    color: var(--text); font-weight: 600;
+    white-space: nowrap;
+  }
+  .history-table td.col-date { text-align: left; font-size: 14px; color: var(--text2); font-weight: 500; }
+  .history-table td.col-venue { text-align: left; }
+  .history-table tbody tr:last-child td { border-bottom: none; }
+  .history-table tbody tr:nth-child(even) td { background: rgba(0,0,0,0.025); }
+  .venue-tag {
+    font-size: 11px; color: var(--accent);
+    background: rgba(192,57,43,0.08); border-radius: 5px;
+    padding: 2px 7px; font-weight: 600; white-space: nowrap; display: inline-block;
+  }
+  .sub-venue-tag {
+    font-size: 11px; color: var(--warn);
+    background: rgba(230,126,34,0.1); border-radius: 5px;
+    padding: 2px 7px; font-weight: 600; white-space: nowrap; display: inline-block;
+  }
+
+  /* ── POOL ── */
+  .pool-track-block {
+    background: var(--bg2); border: 1.5px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .pool-track-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+  }
+  .pool-track-name { font-size: 15px; font-weight: 700; color: var(--text); }
+  .pool-track-count { font-size: 12px; color: var(--text3); }
+  .pool-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .pool-tag {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--bg3); border: 1.5px solid var(--border2);
+    border-radius: 8px; padding: 6px 10px 6px 12px;
+    font-size: 14px; font-weight: 600; color: var(--text);
+  }
+  .pool-tag-del {
+    background: none; border: none; color: var(--text3);
+    cursor: pointer; font-size: 18px; line-height: 1; padding: 0 2px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pool-add-row { display: flex; gap: 8px; }
+  .pool-add-input {
+    background: var(--bg3); border: 1.5px solid var(--border2);
+    color: var(--text); border-radius: var(--radius-sm);
+    padding: 9px 12px; font-size: 15px; flex: 1; font-family: inherit;
+  }
+  .pool-add-input:focus { outline: none; border-color: var(--accent); }
+  .pool-save-bar {
+    position: fixed; bottom: 62px; left: 0; right: 0;
+    background: rgba(245,240,232,0.97); backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border2);
+    padding: 10px 16px; display: none; align-items: center; gap: 12px; z-index: 90;
+  }
+  .pool-save-status { font-size: 13px; color: var(--warn); flex: 1; font-weight: 600; }
+
+  /* ── CONFIRM MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    z-index: 200; display: flex; align-items: flex-end;
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-sheet {
+    background: var(--bg2); border-radius: 20px 20px 0 0;
+    padding: 20px 20px 36px; width: 100%;
+    transform: translateY(100%); transition: transform .25s ease;
+  }
+  .modal-overlay.show .modal-sheet { transform: translateY(0); }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+  .modal-body { font-size: 14px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btns .btn { flex: 1; text-align: center; padding: 12px; font-size: 15px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 74px; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: var(--bg2);
+    border-radius: var(--radius-sm); padding: 10px 20px;
+    font-size: 13px; font-weight: 500;
+    opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- 推薦歌單 -->
+<div class="page active" id="page-recommend">
+  <div class="page-header">
+    <h2>🥊 推薦歌單</h2>
+    <button class="btn" onclick="loadRecommend()">🔄 重新推薦</button>
+  </div>
+  <div id="recommend-list"><div class="loading"><div class="spinner"></div>載入中...</div></div>
+  <div class="save-bar" id="save-bar" style="display:none;">
+    <div class="save-bar-row">
+      <label>日期</label>
+      <input type="date" id="save-date">
+    </div>
+    <div class="save-bar-row">
+      <label>場館</label>
+      <div class="venue-fixed-tag">市民館周日</div>
+    </div>
+    <div class="save-bar-row" id="sub-venue-row" style="display:none;">
+      <label>代課<br>場館</label>
+      <input class="save-bar-text-input" type="text" id="sub-venue-input" placeholder="輸入代課場館名稱">
+    </div>
+    <div class="save-bar-row">
+      <label>類型</label>
+      <select id="save-type" onchange="toggleSubVenue()" style="background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:9px 12px;font-size:15px;flex:1;">
+        <option value="正課">正課</option>
+        <option value="代課">代課</option>
+      </select>
+    </div>
+    <div class="save-bar-row">
+      <label>備註</label>
+      <input class="save-bar-text-input" type="text" id="save-note" placeholder="選填">
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:13px;font-size:16px;" onclick="saveRecord()">✓ 存入紀錄</button>
+  </div>
+</div>
+
+<!-- 正課紀錄 -->
+<div class="page" id="page-history">
+  <div class="page-header"><h2>📋 正課紀錄</h2></div>
+  <div id="history-list"><div class="loading"><div class="spinner"></div>載入中...</div></div>
+</div>
+
+<!-- 代課紀錄 -->
+<div class="page" id="page-substitute">
+  <div class="page-header"><h2>🔄 代課紀錄</h2></div>
+  <div id="substitute-list"><div class="loading"><div class="spinner"></div>載入中...</div></div>
+</div>
+
+<!-- 曲目管理 -->
+<div class="page" id="page-pool">
+  <div class="page-header"><h2>🎛 曲目管理</h2></div>
+  <div id="pool-list" style="padding-bottom:60px;"><div class="loading"><div class="spinner"></div>載入中...</div></div>
+  <div class="pool-save-bar" id="pool-save-bar">
+    <span class="pool-save-status">有未儲存的變更</span>
+    <button class="btn btn-primary" onclick="savePool()">儲存變更</button>
+  </div>
+</div>
+
+<!-- 底部導航 -->
+<nav>
+  <div class="nav-tab active" onclick="showPage('recommend',this)">
+    <div class="nav-icon">🎵</div>推薦
+  </div>
+  <div class="nav-tab" onclick="showPage('history',this)">
+    <div class="nav-icon">📋</div>正課
+  </div>
+  <div class="nav-tab" onclick="showPage('substitute',this)">
+    <div class="nav-icon">🔄</div>代課
+  </div>
+  <div class="nav-tab" onclick="showPage('pool',this)">
+    <div class="nav-icon">🎛</div>曲目
+  </div>
+</nav>
+
+<!-- 確認 Modal -->
+<div class="modal-overlay" id="modal" onclick="closeModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-btns">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-danger" id="modal-confirm-btn">確認</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbx5KDTSByvlh69F5aBPQaD0BFVsPE-vy3dXZsoHDOE5AlIavQdrDursAxDpM48LIhuJtA/exec';
+let currentRecommend = {}, poolData = {}, skipList = {}, allLastSeen = {};
+let modalCallback = null;
+
+// ── Modal ──
+function showModal(title, body, confirmText, onConfirm) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  document.getElementById('modal-confirm-btn').textContent = confirmText || '確認';
+  modalCallback = onConfirm;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  modalCallback = null;
+}
+document.getElementById('modal-confirm-btn').onclick = () => {
+  if (modalCallback) modalCallback();
+  closeModal();
+};
+
+// ── 頁面切換 ──
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'history') loadHistory();
+  if (name === 'substitute') loadSubstitute();
+  if (name === 'pool') loadPool();
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function toggleSubVenue() {
+  const isSub = document.getElementById('save-type').value === '代課';
+  document.getElementById('sub-venue-row').style.display = isSub ? 'flex' : 'none';
+}
+
+// ── 推薦歌單 ──
+async function loadRecommend() {
+  skipList = {};
+  document.getElementById('recommend-list').innerHTML = '<div class="loading"><div class="spinner"></div>推薦中...</div>';
+  document.getElementById('save-bar').style.display = 'none';
+  try {
+    const [r1, r2] = await Promise.all([fetch(API+'?action=recommend'), fetch(API+'?action=getPool')]);
+    const recJson = await r1.json();
+    currentRecommend = recJson.recommended;
+    allLastSeen = recJson.allLastSeen || {};
+    poolData = (await r2.json()).data;
+    renderRecommend();
+    document.getElementById('save-bar').style.display = 'flex';
+    document.getElementById('save-date').value = new Date().toISOString().slice(0,10);
+  } catch(e) {
+    document.getElementById('recommend-list').innerHTML = '<div class="loading">載入失敗，請重試</div>';
+  }
+}
+
+function renderRecommend() {
+  const html = Array.from({length:10}, (_,i) => {
+    const t = i+1, key = `track${t}`;
+    const rel = currentRecommend[key] || '';
+    const last = currentRecommend[key+'_lastSeen'] || '';
+    const isNever = last === '從未教過';
+    const opts = (poolData[key]||[]).map(c=>`<option value="${c}" ${c===rel?'selected':''}>${c}</option>`).join('');
+    return `<div class="track-card">
+      <div class="track-card-top">
+        <div class="track-num">TRACK ${t}</div>
+        <div class="release-badge" id="badge-${t}">${rel||'—'}</div>
+        <div class="release-meta ${isNever?'never':''}" id="meta-${t}">${isNever?'⚠ 從未教過':'上次：'+last}</div>
+      </div>
+      <div class="track-card-bottom">
+        <select class="track-select" id="sel-${t}" onchange="changeTrack(${t},this.value)">${opts}</select>
+        <input class="track-add-input" id="new-${t}" placeholder="新套數" maxlength="6"
+          onkeydown="if(event.key==='Enter')confirmAddToPool(${t})">
+        <button class="btn btn-sm" onclick="confirmAddToPool(${t})">＋</button>
+        <button class="btn btn-sm" onclick="skipTrack(${t})">⏭</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmRemoveFromPool(${t})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('recommend-list').innerHTML = html;
+}
+
+function changeTrack(t, val) {
+  currentRecommend[`track${t}`] = val;
+  document.getElementById(`badge-${t}`).textContent = val;
+  const key = `track${t}`;
+  const lastSeen = (allLastSeen[key] || {})[val] || '從未教過';
+  const isNever = lastSeen === '從未教過';
+  document.getElementById(`meta-${t}`).textContent = isNever ? '從未教過' : '上次：' + lastSeen;
+  document.getElementById(`meta-${t}`).className = 'release-meta' + (isNever ? ' never' : '');
+}
+
+function confirmAddToPool(t) {
+  const key = `track${t}`;
+  const input = document.getElementById(`new-${t}`);
+  const val = input.value.trim();
+  if (!val) { toast('請輸入套數'); return; }
+  if ((poolData[key]||[]).includes(val)) { toast(`${val} 已在曲目中`); input.value=''; return; }
+  showModal(
+    `新增到 Track ${t} 曲目`,
+    `確定把 Release ${val} 加入 Track ${t} 的候選曲目嗎？`,
+    '新增',
+    () => addToPool(t, val)
+  );
+}
+
+async function addToPool(t, val) {
+  const key = `track${t}`;
+  document.getElementById(`new-${t}`).value = '';
+  poolData[key] = [...(poolData[key]||[]), val];
+  const sel = document.getElementById(`sel-${t}`);
+  const opt = document.createElement('option');
+  opt.value=val; opt.textContent=val; opt.selected=true;
+  sel.appendChild(opt); changeTrack(t, val);
+  try {
+    await fetch(API, {method:'POST', body:JSON.stringify({action:'updatePool', pool:poolData})});
+    toast(`✓ ${val} 已新增到 Track ${t}`);
+  } catch(e) { toast('儲存失敗'); }
+}
+
+function skipTrack(t) {
+  const key = `track${t}`, val = currentRecommend[key];
+  if (!val) return;
+  if (!skipList[key]) skipList[key] = [];
+  skipList[key].push(val);
+
+  // 排除跳過清單，剩下的按 lastSeen 由舊到新重新排序，選最久沒教的
+  const trackLastSeen = allLastSeen[key] || {};
+  const candidates = (poolData[key]||[])
+    .filter(r => !(skipList[key]||[]).includes(r))
+    .sort((a, b) => {
+      const da = trackLastSeen[a] || '0000-00-00';
+      const db = trackLastSeen[b] || '0000-00-00';
+      return da < db ? -1 : da > db ? 1 : 0;
+    });
+
+  if (!candidates.length) { toast(`Track ${t} 已無其他曲目`); return; }
+  const next = candidates[0];
+  const nextLastSeen = trackLastSeen[next] || '從未教過';
+  currentRecommend[key] = next;
+  currentRecommend[key+'_lastSeen'] = nextLastSeen;
+
+  document.getElementById(`badge-${t}`).textContent = next;
+  const isNever = nextLastSeen === '從未教過';
+  document.getElementById(`meta-${t}`).textContent = isNever ? '從未教過' : '上次：' + nextLastSeen;
+  document.getElementById(`meta-${t}`).className = 'release-meta' + (isNever ? ' never' : '');
+  Array.from(document.getElementById(`sel-${t}`).options).forEach(o=>o.selected=o.value===next);
+  toast(`Track ${t} → Release ${next}`);
+}
+
+function confirmRemoveFromPool(t) {
+  const key = `track${t}`, val = currentRecommend[key];
+  if (!val) return;
+  showModal(
+    `永久移除 Release ${val}`,
+    `確定把 Release ${val} 從 Track ${t} 的候選曲目中永久移除嗎？此動作無法復原。`,
+    '永久移除',
+    () => removeFromPool(t, val)
+  );
+}
+
+async function removeFromPool(t, val) {
+  const key = `track${t}`;
+  poolData[key] = (poolData[key]||[]).filter(r=>r!==val);
+  if (!skipList[key]) skipList[key]=[];
+  skipList[key].push(val);
+  const next = ((poolData[key]||[]).filter(r=>!(skipList[key]||[]).includes(r)))[0]||'';
+  currentRecommend[key] = next;
+  const sel = document.getElementById(`sel-${t}`);
+  Array.from(sel.options).forEach(o=>{if(o.value===val)o.remove();});
+  Array.from(sel.options).forEach(o=>o.selected=o.value===next);
+  document.getElementById(`badge-${t}`).textContent = next||'—';
+  document.getElementById(`meta-${t}`).textContent = next?'（已刪除換選）':'無可用曲目';
+  try {
+    await fetch(API, {method:'POST', body:JSON.stringify({action:'updatePool', pool:poolData})});
+    toast(`✓ ${val} 已永久移除`);
+  } catch(e) { toast('儲存失敗'); }
+}
+
+async function saveRecord() {
+  const rawDate = document.getElementById('save-date').value;
+  if (!rawDate) { toast('請選擇日期'); return; }
+  // 強制格式化為 YYYY-MM-DD
+  const d = new Date(rawDate + 'T00:00:00');
+  const date = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  const type = document.getElementById('save-type').value;
+  const isSub = type === '代課';
+  let venue = '市民館周日';
+  if (isSub) {
+    venue = document.getElementById('sub-venue-input').value.trim();
+    if (!venue) { toast('請輸入代課場館名稱'); return; }
+  }
+  const payload = { action: isSub?'saveSubstitute':'saveHistory', date, venue };
+  for (let t=1;t<=10;t++) payload[`track${t}`] = currentRecommend[`track${t}`]||'';
+  const noteInput = document.getElementById('save-note').value.trim();
+  payload.note = isSub ? ('代課' + (noteInput ? '／' + noteInput : '')) : noteInput;
+  try {
+    await fetch(API, {method:'POST', body:JSON.stringify(payload)});
+    toast(`✓ 已存入${isSub?'代課':'正課'}紀錄`);
+    if (isSub) document.getElementById('sub-venue-input').value = '';
+    document.getElementById('save-note').value = '';
+  } catch(e) { toast('儲存失敗'); }
+}
+
+// ── History ──
+function renderHistoryRows(rows, isSub) {
+  return rows.map(r => `<tr>
+    <td class="col-date">${r.date}</td>
+    <td class="col-venue"><span class="${isSub?'sub-venue-tag':'venue-tag'}">${r.venue}</span></td>
+    ${Array.from({length:10},(_,i)=>`<td class="col-track">${r['track'+(i+1)]||'—'}</td>`).join('')}
+  </tr>`).join('');
+}
+
+function renderHistoryTable(rows, isSub) {
+  if (!rows.length) return '<div class="loading">尚無紀錄</div>';
+  return `<div class="history-table-wrap">
+    <table class="history-table">
+      <thead><tr>
+        <th class="col-date">日期</th>
+        <th class="col-venue">場館</th>
+        ${Array.from({length:10},(_,i)=>`<th class="col-track">T${i+1}</th>`).join('')}
+      </tr></thead>
+      <tbody>${renderHistoryRows(rows, isSub)}</tbody>
+    </table>
+  </div>`;
+}
+
+async function loadHistory() {
+  document.getElementById('history-list').innerHTML = '<div class="loading"><div class="spinner"></div>載入中...</div>';
+  try {
+    const rows = ((await (await fetch(API+'?action=getHistory')).json()).data||[]).reverse();
+    document.getElementById('history-list').innerHTML = renderHistoryTable(rows, false);
+  } catch(e) { document.getElementById('history-list').innerHTML='<div class="loading">載入失敗</div>'; }
+}
+
+async function loadSubstitute() {
+  document.getElementById('substitute-list').innerHTML = '<div class="loading"><div class="spinner"></div>載入中...</div>';
+  try {
+    const rows = (await (await fetch(API+'?action=getSubstitute')).json()).data||[];
+    document.getElementById('substitute-list').innerHTML = renderHistoryTable(rows, true);
+  } catch(e) { document.getElementById('substitute-list').innerHTML='<div class="loading">載入失敗</div>'; }
+}
+
+// ── Pool ──
+async function loadPool() {
+  document.getElementById('pool-list').innerHTML = '<div class="loading"><div class="spinner"></div>載入中...</div>';
+  document.getElementById('pool-save-bar').style.display = 'none';
+  try {
+    poolData = (await (await fetch(API+'?action=getPool')).json()).data;
+    renderPool();
+  } catch(e) { document.getElementById('pool-list').innerHTML='<div class="loading">載入失敗</div>'; }
+}
+
+function renderPool() {
+  document.getElementById('pool-list').innerHTML = Array.from({length:10},(_,i)=>{
+    const key=`track${i+1}`, releases=poolData[key]||[];
+    return `<div class="pool-track-block">
+      <div class="pool-track-header">
+        <div class="pool-track-name">Track ${i+1}</div>
+        <div class="pool-track-count" id="cnt-${key}">${releases.length} 首</div>
+      </div>
+      <div class="pool-tags" id="tags-${key}">${releases.map(r=>`
+        <div class="pool-tag">${r}
+          <button class="pool-tag-del" onclick="confirmRemoveRelease('${key}','${r}')">×</button>
+        </div>`).join('')}</div>
+      <div class="pool-add-row">
+        <input class="pool-add-input" id="add-${key}" placeholder="新增套數（如 107）" maxlength="6"
+          onkeydown="if(event.key==='Enter')confirmAddRelease('${key}')">
+        <button class="btn btn-sm" onclick="confirmAddRelease('${key}')">新增</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('pool-save-bar').style.display = 'none';
+}
+
+function confirmAddRelease(key) {
+  const input = document.getElementById('add-'+key);
+  const val = input.value.trim();
+  if (!val) return;
+  if ((poolData[key]||[]).includes(val)) { toast(`${val} 已在曲目中`); input.value=''; return; }
+  const trackNum = key.replace('track','');
+  showModal(
+    `新增到 Track ${trackNum} 曲目`,
+    `確定把 Release ${val} 加入 Track ${trackNum} 的候選曲目嗎？`,
+    '新增',
+    () => { addRelease(key, val); input.value=''; }
+  );
+}
+
+function confirmRemoveRelease(key, rel) {
+  const trackNum = key.replace('track','');
+  showModal(
+    `移除 Release ${rel}`,
+    `確定把 Release ${rel} 從 Track ${trackNum} 的候選曲目中移除嗎？`,
+    '移除',
+    () => removeRelease(key, rel)
+  );
+}
+
+function addRelease(key, val) {
+  if (!(poolData[key]||[]).includes(val)) {
+    poolData[key] = [...(poolData[key]||[]), val];
+    rerenderTags(key);
+    document.getElementById('pool-save-bar').style.display = 'flex';
+  }
+}
+
+function removeRelease(key, rel) {
+  poolData[key] = (poolData[key]||[]).filter(r=>r!==rel);
+  rerenderTags(key);
+  document.getElementById('pool-save-bar').style.display = 'flex';
+}
+
+function rerenderTags(key) {
+  const releases = poolData[key]||[];
+  document.getElementById('tags-'+key).innerHTML = releases.map(r=>`
+    <div class="pool-tag">${r}
+      <button class="pool-tag-del" onclick="confirmRemoveRelease('${key}','${r}')">×</button>
+    </div>`).join('');
+  document.getElementById('cnt-'+key).textContent = releases.length + ' 首';
+}
+
+async function savePool() {
+  try {
+    await fetch(API, {method:'POST', body:JSON.stringify({action:'updatePool', pool:poolData})});
+    document.getElementById('pool-save-bar').style.display = 'none';
+    toast('✓ 曲目清單已儲存');
+  } catch(e) { toast('儲存失敗'); }
+}
+
+loadRecommend();
+</script>
+</body>
+</html>
