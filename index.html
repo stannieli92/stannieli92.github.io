@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的工具箱</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 30% 20%, #1a2a4a 0%, #0d1b35 40%, #060d1f 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px 60px;
+    font-family: -apple-system, 'SF Pro Display', 'PingFang TC', sans-serif;
+  }
+  .date-widget {
+    text-align: center;
+    margin-bottom: 48px;
+    color: white;
+  }
+  .date-widget .time {
+    font-size: 72px;
+    font-weight: 200;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .date-widget .date {
+    font-size: 16px;
+    opacity: 0.6;
+    margin-top: 8px;
+    letter-spacing: 0.3px;
+  }
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px 16px;
+    width: 100%;
+    max-width: 360px;
+  }
+  .app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .icon-box {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.07);
+    border: 0.5px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+  }
+  .app-icon:active .icon-box {
+    transform: scale(0.88);
+    opacity: 0.7;
+  }
+  .app-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.72);
+    text-align: center;
+    width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="date-widget">
+  <div class="time" id="clock-big">--:--</div>
+  <div class="date" id="clock-date"></div>
+</div>
+<div class="app-grid">
+
+  <!-- BodyCombat 歌單 -->
+  <a class="app-icon" href="bodycombat.html">
+    <div class="icon-box">👊</div>
+    <div class="app-label">BC自動歌單</div>
+  </a>
+
+  <!-- 空白格子，之後替換成真正的工具 -->
+  <div class="app-icon"><div class="icon-box"></div><div class="app-label"></div></div>
+  <div class="app-icon"><div class="icon-box"></div><div class="app-label"></div></div>
+  <div class="app-icon"><div class="icon-box"></div><div class="app-label"></div></div>
+  <div class="app-icon"><div class="icon-box"></div><div class="app-label"></div></div>
+  <div class="app-icon"><div class="icon-box"></div><div class="app-label"></div></div>
+  <div class="app-icon"><div class="icon-box"></div><div class="app-label"></div></div>
+  <div class="app-icon"><div class="icon-box"></div><div class="app-label"></div></div>
+
+</div>
+<script>
+  function updateClock() {
+    const now = new Date();
+    const h = now.getHours().toString().padStart(2, '0');
+    const m = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('clock-big').textContent = h + ':' + m;
+    const days = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+    document.getElementById('clock-date').textContent =
+      days[now.getDay()] + '　' + (now.getMonth() + 1) + ' 月 ' + now.getDate() + ' 日';
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+</script>
+</body>
+</html>
